@@ -136,6 +136,39 @@ namespace SalesManago
             }
         }
 
+        public async Task<ContactBasicExportResponse> ContactBasicExportAsync(string email, CancellationToken cancellationToken)
+        {
+            var apiKey = Guid.NewGuid().ToString().ToLower();
+            var sha = GetSHA(apiKey);
+            var requestTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            HttpRequestMessage request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "api/contact/basic");
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                apiKey,
+                requestTime,
+                sha,
+                user = _settings.Owner,
+                email = new string[] { email }
+            };
+            var serialized = JsonConvert.SerializeObject(content, Formatting.Indented);
+            request.Content = new StringContent(
+                serialized,
+                Encoding.UTF8,
+                "application/json");//CONTENT-TYPE header
+
+            var response = await _client.SendAsync(request, cancellationToken);
+            using (HttpContent responseContent = response.Content)
+            {
+                var json = await responseContent.ReadAsStringAsync(cancellationToken);
+                var result = JsonConvert.DeserializeObject<ContactBasicExportResponse>(json);
+                return result;
+            }
+        }
+
         internal string GetSHA(string apiKey)
         {
             var input = apiKey + _settings.ClientId + _settings.ApiSecret;
