@@ -4,6 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Tomasz Cekało</Authors>
+    <PackageProjectUrl>https://github.com/tomaszcekalo/SalesManago</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tomaszcekalo/SalesManago</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
