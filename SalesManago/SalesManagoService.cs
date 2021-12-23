@@ -14,146 +14,99 @@ namespace SalesManago
         private SalesManagoSettings _settings;
         private HttpClient _client;
 
+        //public SalesManagoService(SalesManagoSettings settings, IHttpClientFactory httpClientFactory)
+        //: this(settings, httpClientFactory.CreateClient())
         public SalesManagoService(SalesManagoSettings settings, HttpClient httpClient)
         {
             _settings = settings;
+            //_client = httpClientFactory.CreateClient();
             _client = httpClient;
             _client.BaseAddress = new Uri(settings.Endpoint);
             _client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        /// <summary>
-        /// https://docs.salesmanago.pl/#pobieranie-stworzonych-wiadomo-ci
-        /// </summary>
-        /// <returns></returns>
+        //public SalesManagoService(SalesManagoSettings settings, HttpClient httpClient)
+        //{
+        //    _settings = settings;
+        //    _client = httpClient;
+        //    _client.BaseAddress = new Uri(settings.Endpoint);
+        //    _client.DefaultRequestHeaders.Accept.Add(
+        //                new MediaTypeWithQualityHeaderValue("application/json"));
+        //}
+
         public async Task<GetMessagesResponse> GetEmailMessagesAsync(CancellationToken cancellationToken)
         {
-            var apiKey = Guid.NewGuid().ToString().ToLower();
-            var sha = GetSHA(apiKey);
-            var requestTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            HttpRequestMessage request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "api/email/messages");
+            var sm = GetSalesManagoBase();
+
             var content = new
             {
                 clientId = _settings.ClientId,
-                apiKey,
-                requestTime,
-                sha,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
                 owner = _settings.Owner
             };
-            var serialized = JsonConvert.SerializeObject(content, Formatting.Indented);
-            request.Content = new StringContent(
-                serialized,
-                Encoding.UTF8,
-                "application/json");//CONTENT-TYPE header
-
-            var response = await _client.SendAsync(request, cancellationToken);
-            using (HttpContent responseContent = response.Content)
-            {
-                var json = await responseContent.ReadAsStringAsync(cancellationToken);
-                var result = JsonConvert.DeserializeObject<GetMessagesResponse>(json);
-                return result;
-            }
+            var result = await this.SendSalesManagoRequest<GetMessagesResponse>(
+                "api/email/messages", content, cancellationToken);
+            return result;
         }
 
-        /// <summary>
-        /// https://docs.salesmanago.pl/#wysy-anie-wiadomo-ci-email-zalecana
-        /// </summary>
-        /// <param name="emailId"></param>
-        /// <param name="contacts"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         public async Task<SendEmailResponse> SendEmailAsync(
             Guid emailId,
             SendEmailContact[] contacts,
             CancellationToken cancellationToken)
         {
-            var apiKey = Guid.NewGuid().ToString().ToLower();
-            var sha = GetSHA(apiKey);
-            var requestTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            HttpRequestMessage request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "api/email/sendEmail");
+            var sm = GetSalesManagoBase();
+
             var content = new
             {
                 owner = _settings.Owner,
                 clientId = _settings.ClientId,
-                apiKey,
-                requestTime,
-                sha,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
                 user = _settings.Owner,
                 emailId,
-                date = requestTime,
+                date = sm.requestTime,
                 contacts
             };
-            var serialized = JsonConvert.SerializeObject(content, Formatting.Indented);
-            request.Content = new StringContent(
-                serialized,
-                Encoding.UTF8,
-                "application/json");//CONTENT-TYPE header
-
-            var response = await _client.SendAsync(request, cancellationToken);
-            using (HttpContent responseContent = response.Content)
-            {
-                var json = await responseContent.ReadAsStringAsync(cancellationToken);
-                var result = JsonConvert.DeserializeObject<SendEmailResponse>(json);
-                return result;
-            }
+            var result = await this.SendSalesManagoRequest<SendEmailResponse>(
+                "api/email/sendEmail", content, cancellationToken);
+            return result;
         }
 
         public async Task<HasContactResponse> HasContactAsync(string email, CancellationToken cancellationToken)
         {
-            var apiKey = Guid.NewGuid().ToString().ToLower();
-            var sha = GetSHA(apiKey);
-            var requestTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            HttpRequestMessage request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "api/contact/hasContact");
+            var sm = GetSalesManagoBase();
             var content = new
             {
                 owner = _settings.Owner,
                 clientId = _settings.ClientId,
-                apiKey,
-                requestTime,
-                sha,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
                 user = _settings.Owner,
                 email
             };
-            var serialized = JsonConvert.SerializeObject(content, Formatting.Indented);
-            request.Content = new StringContent(
-                serialized,
-                Encoding.UTF8,
-                "application/json");//CONTENT-TYPE header
-
-            var response = await _client.SendAsync(request, cancellationToken);
-            using (HttpContent responseContent = response.Content)
-            {
-                var json = await responseContent.ReadAsStringAsync(cancellationToken);
-                var result = JsonConvert.DeserializeObject<HasContactResponse>(json);
-                return result;
-            }
+            var result = await this.SendSalesManagoRequest<HasContactResponse>(
+                "api/contact/hasContact", content, cancellationToken);
+            return result;
         }
 
-        public async Task<ContactBasicExportResponse> ContactBasicExportAsync(string email, CancellationToken cancellationToken)
+        public (string apiKey, string sha, long requestTime) GetSalesManagoBase()
         {
             var apiKey = Guid.NewGuid().ToString().ToLower();
             var sha = GetSHA(apiKey);
             var requestTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            return (apiKey, sha, requestTime);
+        }
+
+        public async Task<T> SendSalesManagoRequest<T>(string url, object? content, CancellationToken cancellationToken)
+        {
             HttpRequestMessage request = new HttpRequestMessage(
                 HttpMethod.Post,
-                "api/contact/basic");
-            var content = new
-            {
-                owner = _settings.Owner,
-                clientId = _settings.ClientId,
-                apiKey,
-                requestTime,
-                sha,
-                user = _settings.Owner,
-                email = new string[] { email }
-            };
+                url);
             var serialized = JsonConvert.SerializeObject(content, Formatting.Indented);
             request.Content = new StringContent(
                 serialized,
@@ -164,9 +117,27 @@ namespace SalesManago
             using (HttpContent responseContent = response.Content)
             {
                 var json = await responseContent.ReadAsStringAsync(cancellationToken);
-                var result = JsonConvert.DeserializeObject<ContactBasicExportResponse>(json);
+                var result = JsonConvert.DeserializeObject<T>(json);
                 return result;
             }
+        }
+
+        public async Task<ContactBasicExportResponse> ContactBasicByEmailAsync(string email, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                email = new string[] { email }
+            };
+            var result = await this.SendSalesManagoRequest<ContactBasicExportResponse>(
+                "api/contact/basic", content, cancellationToken);
+            return result;
         }
 
         internal string GetSHA(string apiKey)
@@ -186,6 +157,96 @@ namespace SalesManago
                 var sha = sb.ToString();
                 return sha;
             }
+        }
+
+        public async Task<ContactBasicExportResponse> ContactBasicByIdAsync(string id, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                id = new string[] { id }
+            };
+            var result = await this.SendSalesManagoRequest<ContactBasicExportResponse>(
+                "api/contact/basicById", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactBasicExportResponse> ContactListByEmailAsync(string email, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                email = new string[] { email }
+            };
+            var result = await this.SendSalesManagoRequest<ContactBasicExportResponse>(
+                "api/contact/list", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactBasicExportResponse> ContactListByIdAsync(string contactId, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                icontactId = new string[] { contactId }
+            };
+            var result = await this.SendSalesManagoRequest<ContactBasicExportResponse>(
+                "api/contact/basicById", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactBasicExportResponse> ContactListAllByEmailAsync(string email, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                email = new string[] { email }
+            };
+            var result = await this.SendSalesManagoRequest<ContactBasicExportResponse>(
+                "api/contact/listAll", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactBasicExportResponse> ContactListAllByIdAsync(string contactId, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                contactId = new string[] { contactId }
+            };
+            var result = await this.SendSalesManagoRequest<ContactBasicExportResponse>(
+                "api/contact/listAllById", content, cancellationToken);
+            return result;
         }
     }
 }
