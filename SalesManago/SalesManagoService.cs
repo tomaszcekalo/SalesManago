@@ -14,26 +14,14 @@ namespace SalesManago
         private SalesManagoSettings _settings;
         private HttpClient _client;
 
-        //public SalesManagoService(SalesManagoSettings settings, IHttpClientFactory httpClientFactory)
-        //: this(settings, httpClientFactory.CreateClient())
         public SalesManagoService(SalesManagoSettings settings, HttpClient httpClient)
         {
             _settings = settings;
-            //_client = httpClientFactory.CreateClient();
             _client = httpClient;
             _client.BaseAddress = new Uri(settings.Endpoint);
             _client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
         }
-
-        //public SalesManagoService(SalesManagoSettings settings, HttpClient httpClient)
-        //{
-        //    _settings = settings;
-        //    _client = httpClient;
-        //    _client.BaseAddress = new Uri(settings.Endpoint);
-        //    _client.DefaultRequestHeaders.Accept.Add(
-        //                new MediaTypeWithQualityHeaderValue("application/json"));
-        //}
 
         public async Task<GetMessagesResponse> GetEmailMessagesAsync(CancellationToken cancellationToken)
         {
