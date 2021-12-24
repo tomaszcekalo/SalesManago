@@ -26,6 +26,12 @@ namespace SalesManago
             SendEmailContact[] contacts,
             CancellationToken cancellationToken);
 
+        /// <summary>
+        /// https://docs.salesmanago.com/#checking-if-a-contact-is-already-recorded
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         Task<HasContactResponse> HasContactAsync(string email, CancellationToken cancellationToken);
 
         /// <summary>
