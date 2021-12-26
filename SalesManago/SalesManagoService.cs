@@ -236,5 +236,101 @@ namespace SalesManago
                 "api/contact/listAllById", content, cancellationToken);
             return result;
         }
+
+        public async Task<CreatedContactsResponse> CreatedContactsAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<CreatedContactsResponse>(
+                "api/contact/createdContacts", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ModifiedContactsResponse> ModifiedContactsAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<ModifiedContactsResponse>(
+                "api/contact/modifiedContacts", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<PaginatedModifiedContactsResponse> PaginatedModifiedContactsAsync(
+            long from,
+            long to,
+            int page,
+            int size,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                from,
+                to,
+                page,
+                size
+            };
+            var result = await this.SendSalesManagoRequest<PaginatedModifiedContactsResponse>(
+                "api/contact/paginatedModifiedContacts", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactRecentActivityResponse> ContactRecentActivityAsync(
+            long from,
+            long to,
+            bool allVisits,
+            bool ipDetails,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                from,
+                to,
+                allVisits,
+                ipDetails
+            };
+            var result = await this.SendSalesManagoRequest<ContactRecentActivityResponse>(
+                "api/contact/recentActivity", content, cancellationToken);
+            return result;
+        }
     }
 }

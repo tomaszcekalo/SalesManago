@@ -73,5 +73,45 @@ namespace SalesManago
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContactBasicExportResponse> ContactListAllByIdAsync(string contactId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// https://docs.salesmanago.com/#exporting-the-list-of-recently-created-contacts
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<CreatedContactsResponse> CreatedContactsAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// https://docs.salesmanago.com/#exporting-the-list-of-recently-modified-contacts
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<ModifiedContactsResponse> ModifiedContactsAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// https://docs.salesmanago.com/#paginated-modified-contacts-list
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<PaginatedModifiedContactsResponse> PaginatedModifiedContactsAsync(
+            long from,
+            long to,
+            int page,
+            int size,
+            CancellationToken cancellationToken);
     }
 }
