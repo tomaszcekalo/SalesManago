@@ -113,5 +113,21 @@ namespace SalesManago
             int page,
             int size,
             CancellationToken cancellationToken);
+
+        /// <summary>
+        /// https://docs.salesmanago.com/#contacts-39-activity
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="allVisits"></param>
+        /// <param name="ipDetails"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<ContactRecentActivityResponse> ContactRecentActivityAsync(
+            long from,
+            long to,
+            bool allVisits,
+            bool ipDetails,
+            CancellationToken cancellationToken);
     }
 }
