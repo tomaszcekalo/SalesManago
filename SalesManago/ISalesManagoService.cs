@@ -129,5 +129,10 @@ namespace SalesManago
             bool allVisits,
             bool ipDetails,
             CancellationToken cancellationToken);
+
+        Task<PaginatedContactsListExportResponse> PaginatedContactListExportAsync(
+            int page,
+            int size,
+            CancellationToken cancellationToken);
     }
 }

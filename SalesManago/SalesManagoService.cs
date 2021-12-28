@@ -332,5 +332,26 @@ namespace SalesManago
                 "api/contact/recentActivity", content, cancellationToken);
             return result;
         }
+
+        public async Task<PaginatedContactsListExportResponse> PaginatedContactListExportAsync(
+            int page,
+            int size,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                page,
+                size
+            };
+            var result = await this.SendSalesManagoRequest<PaginatedContactsListExportResponse>(
+                "api/contact/paginatedContactList/export", content, cancellationToken);
+            return result;
+        }
     }
 }
