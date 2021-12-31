@@ -2,6 +2,7 @@
 {
     public class Contact
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
@@ -13,8 +14,12 @@
         public bool Deleted { get; set; }
         public bool Invalid { get; set; }
         public string Company { get; set; }
+        public string ExternalId { get; set; }
         public ContactAddress Address { get; set; }
-        public Guid ContactId { get; set; }
+
+        public Guid ContactId
+        { get; set; }
+
         public long ModifiedOn { get; set; }
         public long CreatedOn { get; set; }
         public long? LastVisit { get; set; }
