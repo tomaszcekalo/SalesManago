@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace SalesManago
 {
-    public class PaginatedContactsListExportResponse
+    public class PaginatedContactsListExportResponse : BaseResponse
     {
-        public bool Success { get; set; }
-        public string[] Message { get; set; }
         public int RequestId { get; set; }
     }
 }

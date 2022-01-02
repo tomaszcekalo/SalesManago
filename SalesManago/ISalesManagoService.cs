@@ -9,6 +9,9 @@ namespace SalesManago
     public interface ISalesManagoService
     {
         /// <summary>
+        /// <see href="https://docs.salesmanago.com/#downloading-email-messages">docs</see>
+        /// </summary>
+        /// <summary xml:lang="pl">
         /// <see href="https://docs.salesmanago.pl/#pobieranie-stworzonych-wiadomo-ci">docs</see>
         /// </summary>
         /// <returns></returns>
@@ -23,7 +26,7 @@ namespace SalesManago
         /// <returns></returns>
         Task<SendEmailResponse> SendEmailAsync(
             Guid emailId,
-            SendEmailContact[] contacts,
+            Addressee[] contacts,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace SalesManago
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContactBasicExportResponse> ContactBasicByEmailAsync(
-            string email,
+            string[] email,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -53,7 +56,7 @@ namespace SalesManago
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContactBasicExportResponse> ContactBasicByIdAsync(
-            string id,
+            string[] id,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -63,7 +66,17 @@ namespace SalesManago
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContactBasicExportResponse> ContactListByEmailAsync(
-            string email,
+            string[] email,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// <see href="https://docs.salesmanago.com/#export-basic-contacts-39-data-by-contact-id">docs</see>
+        /// </summary>
+        /// <param name="contactId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<ContactBasicExportResponse> ContactListByIdAsync(
+            string[] contactId,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -73,7 +86,7 @@ namespace SalesManago
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContactBasicExportResponse> ContactListAllByEmailAsync(
-            string email,
+            string[] email,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -83,7 +96,7 @@ namespace SalesManago
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ContactBasicExportResponse> ContactListAllByIdAsync(
-            string contactId,
+            string[] contactId,
             CancellationToken cancellationToken);
 
         /// <summary>
@@ -153,7 +166,5 @@ namespace SalesManago
             int page,
             int size,
             CancellationToken cancellationToken);
-
-
     }
 }

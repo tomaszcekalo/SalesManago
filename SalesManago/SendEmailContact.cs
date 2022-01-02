@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SalesManago
 {
-    public class SendEmailContact
+    public class Addressee
     {
         public string AddresseeType { get; set; }
         public string Value { get; set; }

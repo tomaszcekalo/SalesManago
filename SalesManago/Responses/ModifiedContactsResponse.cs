@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace SalesManago
 {
-    public class ModifiedContactsResponse
+    public class ModifiedContactsResponse : BaseResponse
     {
-        public bool Success { get; set; }
-
-        public string[] Message { get; set; }
         public IdEmail[] CreatedContacts { get; set; }
     }
 }

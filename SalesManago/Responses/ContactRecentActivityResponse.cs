@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace SalesManago
 {
-    public class ContactRecentActivityResponse
+    public class ContactRecentActivityResponse : BaseResponse
     {
-        public bool Success { get; set; }
-        public string[] Message { get; set; }
         public Activity[] RecentActivities { get; set; }
     }
 }

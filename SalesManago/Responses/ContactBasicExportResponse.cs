@@ -1,8 +1,7 @@
 ﻿namespace SalesManago
 {
-    public class ContactBasicExportResponse
+    public class ContactBasicExportResponse : BaseResponse
     {
-        public bool Success { get; set; }
         public Contact[] Contacts { get; set; }
     }
 }

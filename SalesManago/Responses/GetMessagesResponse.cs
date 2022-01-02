@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace SalesManago
 {
-    public class GetMessagesResponse
+    public class GetMessagesResponse : BaseResponse
     {
-        public bool Success { get; set; }
         public StandardMessage[] StandardMessages { get; set; }
     }
 
