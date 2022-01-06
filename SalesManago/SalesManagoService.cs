@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
+using SalesManago.Responses;
 
 namespace SalesManago
 {
@@ -526,7 +527,7 @@ namespace SalesManago
         public async Task<BaseResponse> DeleteFunnelOrStageAsync(
             string funnel,
             string stage = "",
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var sm = GetSalesManagoBase();
             var content = new
@@ -650,6 +651,149 @@ namespace SalesManago
             };
             var result = await this.SendSalesManagoRequest<ContactIdsResponse>(
                 "api/contact/batchoptin", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactIdResponse> ContactPhoneOptInAsync(
+            string email,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                email
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdResponse>(
+                "api/contact/phoneoptin", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactIdResponse> ContactPhoneOptOutAsync(
+            string email,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                email
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdResponse>(
+                "api/contact/phoneoptout", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<EventIdResponse> AddContactExternalEventAsync(
+            ContactEvent contactEvent,
+            string email,
+            Guid? contactId = null,
+            bool forceOptIn = false,
+            CancellationToken cancellationToken = default)
+        {
+            if (email is null && contactId is null)
+            {
+                throw new ArgumentException("Either email or contactId need to be provided. ");
+            }
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                email,
+                forceOptIn,
+                contactEvent,
+                contactId,
+            };
+            var result = await this.SendSalesManagoRequest<EventIdResponse>(
+                "api/contact/addContactExtEvent", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<BatchAddContactExtEventResponse> BatchAddContactExternalEventAsync(
+            ContactExternalEvent[] events,
+            CancellationToken cancellationToken = default)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                events
+            };
+            var result = await this.SendSalesManagoRequest<BatchAddContactExtEventResponse>(
+                "api/contact/batchAddContactExtEvent", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<EventIdResponse> UpdateContactExternalEventAsync(
+            ContactEvent contactEvent,
+            CancellationToken cancellationToken = default)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                contactEvent
+            };
+            var result = await this.SendSalesManagoRequest<EventIdResponse>(
+                "api/v2/contact/updateContactExtEvent", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ResultResponse> DeleteContactExternalEventAsync(
+            Guid eventId,
+            CancellationToken cancellationToken = default)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                eventId
+            };
+            var result = await this.SendSalesManagoRequest<ResultResponse>(
+                "api/v2/contact/updateContactExtEvent", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ResultResponse> ExportTagListAsync(
+            bool showSystemTags,
+            CancellationToken cancellationToken = default)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                showSystemTags
+            };
+            var result = await this.SendSalesManagoRequest<ResultResponse>(
+                "api/v2/contact/tags", content, cancellationToken);
             return result;
         }
     }
