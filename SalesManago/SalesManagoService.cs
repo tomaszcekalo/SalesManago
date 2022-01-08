@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 using SalesManago.Responses;
+using System.Collections.Specialized;
 
 namespace SalesManago
 {
@@ -41,30 +42,6 @@ namespace SalesManago
             return result;
         }
 
-        public async Task<SendEmailResponse> SendEmailAsync(
-            Guid emailId,
-            Addressee[] contacts,
-            CancellationToken cancellationToken)
-        {
-            var sm = GetSalesManagoBase();
-
-            var content = new
-            {
-                owner = _settings.Owner,
-                clientId = _settings.ClientId,
-                sm.apiKey,
-                sm.requestTime,
-                sm.sha,
-                user = _settings.Owner,
-                emailId,
-                date = sm.requestTime,
-                contacts
-            };
-            var result = await this.SendSalesManagoRequest<SendEmailResponse>(
-                "api/email/sendEmail", content, cancellationToken);
-            return result;
-        }
-
         public async Task<HasContactResponse> HasContactAsync(string email, CancellationToken cancellationToken)
         {
             var sm = GetSalesManagoBase();
@@ -91,7 +68,11 @@ namespace SalesManago
             return (apiKey, sha, requestTime);
         }
 
-        public async Task<T> SendSalesManagoRequest<T>(string url, object? content, CancellationToken cancellationToken)
+        public async Task<T> SendSalesManagoRequest<T>(
+            string url,
+            object? content,
+            CancellationToken cancellationToken = default,
+            string contentType = "application/json")
         {
             HttpRequestMessage request = new HttpRequestMessage(
                 HttpMethod.Post,
@@ -100,7 +81,7 @@ namespace SalesManago
             request.Content = new StringContent(
                 serialized,
                 Encoding.UTF8,
-                "application/json");//CONTENT-TYPE header
+                contentType);
 
             var response = await _client.SendAsync(request, cancellationToken);
             using (HttpContent responseContent = response.Content)
@@ -794,6 +775,175 @@ namespace SalesManago
             };
             var result = await this.SendSalesManagoRequest<ResultResponse>(
                 "api/v2/contact/tags", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<SendEmailResponse> SendEmailAsync(
+            Guid emailId,
+            string subject,
+            string campaign,
+            string html,
+            Addressee[] contacts,
+            Addressee[] excludeContacts,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                emailId,
+                date = sm.requestTime,
+                contacts,
+                excludeContacts,
+                subject,
+                campaign,
+                html,
+            };
+            var result = await this.SendSalesManagoRequest<SendEmailResponse>(
+                "api/email/sendEmail", content, cancellationToken);
+            return result;
+        }
+
+        // TODO: add file transfer
+        public async Task<SendEmailResponse> SendEmailWithAttachmentAsync(
+            Guid emailId,
+            string subject,
+            string campaign,
+            string html,
+            Addressee[] contacts,
+            Addressee[] excludeContacts,
+            bool immediate,
+            bool rule,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                emailId,
+                date = sm.requestTime,
+                contacts,
+                excludeContacts,
+                subject,
+                campaign,
+                html,
+            };
+            var result = await this.SendSalesManagoRequest<SendEmailResponse>(
+                "api/email/sendWithAttachment", content, cancellationToken, "multipart/form-data");
+            return result;
+        }
+
+        public async Task<EmailIdResponse> AddEmailAsync(
+            string subject,
+            string campaign,
+            Dictionary<string, string> contentBoxMap,
+            bool shared,
+            bool dynamic,
+            Guid EmailAccountId,
+            Guid TemplateId,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                date = sm.requestTime,
+                subject,
+                campaign,
+                contentBoxMap,
+                shared,
+                dynamic,
+                EmailAccountId,
+                TemplateId,
+            };
+            var result = await this.SendSalesManagoRequest<EmailIdResponse>(
+                "api/email/addEmail", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<EmailIdResponse> UpsertEmailByNameAsync(
+            string subject,
+            string campaign,
+            bool shared,
+            bool dynamic,
+            Guid EmailAccountId,
+            Guid TemplateId,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                date = sm.requestTime,
+                subject,
+                campaign,
+                shared,
+                dynamic,
+                EmailAccountId,
+                TemplateId,
+            };
+            var result = await this.SendSalesManagoRequest<EmailIdResponse>(
+                "api/email/addEmail", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<EmailIdResponse> EmailAddTemplateAsync(
+            string emailContent,
+            string urlTemplate,
+            bool shared,
+            bool dynamic,
+            bool parametrized,
+            bool fromUrl,
+            bool titleUrl,
+            string customFields,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                date = sm.requestTime,
+                emailContent,
+                parametrized,
+                shared,
+                dynamic,
+                fromUrl,
+                titleUrl,
+                urlTemplate,
+                customFields
+            };
+            var result = await this.SendSalesManagoRequest<EmailIdResponse>(
+                "api/email/addTemplate", content, cancellationToken);
             return result;
         }
     }

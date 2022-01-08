@@ -21,12 +21,20 @@ namespace SalesManago
         /// <see href="https://docs.salesmanago.pl/#wysy-anie-wiadomo-ci-email-zalecana">docs</see>
         /// </summary>
         /// <param name="emailId"></param>
+        /// <param name="subject"></param>
+        /// <param name="campaign"></param>
+        /// <param name="html"></param>
         /// <param name="contacts"></param>
+        /// <param name="excludeContacts"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<SendEmailResponse> SendEmailAsync(
             Guid emailId,
+            string subject,
+            string campaign,
+            string html,
             Addressee[] contacts,
+            Addressee[] excludeContacts,
             CancellationToken cancellationToken);
 
         /// <summary>
