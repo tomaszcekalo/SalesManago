@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using SalesManago.Responses;
 using System.Collections.Specialized;
+using SalesManago.Common;
 
 namespace SalesManago
 {
@@ -15,6 +16,7 @@ namespace SalesManago
     {
         private SalesManagoSettings _settings;
         private HttpClient _client;
+        public JsonSerializerSettings Settings { get; init; }
 
         public SalesManagoService(SalesManagoSettings settings, HttpClient httpClient)
         {
@@ -23,41 +25,10 @@ namespace SalesManago
             _client.BaseAddress = new Uri(settings.Endpoint);
             _client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
-        }
-
-        public async Task<GetMessagesResponse> GetEmailMessagesAsync(CancellationToken cancellationToken)
-        {
-            var sm = GetSalesManagoBase();
-
-            var content = new
+            Settings = new JsonSerializerSettings
             {
-                clientId = _settings.ClientId,
-                sm.apiKey,
-                sm.requestTime,
-                sm.sha,
-                owner = _settings.Owner
+                NullValueHandling = NullValueHandling.Ignore
             };
-            var result = await this.SendSalesManagoRequest<GetMessagesResponse>(
-                "api/email/messages", content, cancellationToken);
-            return result;
-        }
-
-        public async Task<HasContactResponse> HasContactAsync(string email, CancellationToken cancellationToken)
-        {
-            var sm = GetSalesManagoBase();
-            var content = new
-            {
-                owner = _settings.Owner,
-                clientId = _settings.ClientId,
-                sm.apiKey,
-                sm.requestTime,
-                sm.sha,
-                user = _settings.Owner,
-                email
-            };
-            var result = await this.SendSalesManagoRequest<HasContactResponse>(
-                "api/contact/hasContact", content, cancellationToken);
-            return result;
         }
 
         public (string apiKey, string sha, long requestTime) GetSalesManagoBase()
@@ -90,6 +61,24 @@ namespace SalesManago
                 var result = JsonConvert.DeserializeObject<T>(json);
                 return result;
             }
+        }
+
+        public async Task<HasContactResponse> HasContactAsync(string email, CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                user = _settings.Owner,
+                email
+            };
+            var result = await this.SendSalesManagoRequest<HasContactResponse>(
+                "api/contact/hasContact", content, cancellationToken);
+            return result;
         }
 
         public async Task<ContactBasicExportResponse> ContactBasicByEmailAsync(string[] email, CancellationToken cancellationToken)
@@ -319,7 +308,7 @@ namespace SalesManago
             return result;
         }
 
-        public async Task<PaginatedContactsListExportResponse> PaginatedContactListExportAsync(
+        public async Task<RequestIdResponse> PaginatedContactListExportAsync(
             int page,
             int size,
             CancellationToken cancellationToken)
@@ -335,7 +324,7 @@ namespace SalesManago
                 page,
                 size
             };
-            var result = await this.SendSalesManagoRequest<PaginatedContactsListExportResponse>(
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
                 "api/contact/paginatedContactList/export", content, cancellationToken);
             return result;
         }
@@ -778,7 +767,7 @@ namespace SalesManago
             return result;
         }
 
-        public async Task<SendEmailResponse> SendEmailAsync(
+        public async Task<ConversationIdResponse> SendEmailAsync(
             Guid emailId,
             string subject,
             string campaign,
@@ -805,13 +794,13 @@ namespace SalesManago
                 campaign,
                 html,
             };
-            var result = await this.SendSalesManagoRequest<SendEmailResponse>(
+            var result = await this.SendSalesManagoRequest<ConversationIdResponse>(
                 "api/email/sendEmail", content, cancellationToken);
             return result;
         }
 
         // TODO: add file transfer
-        public async Task<SendEmailResponse> SendEmailWithAttachmentAsync(
+        public async Task<ConversationIdResponse> SendEmailWithAttachmentAsync(
             Guid emailId,
             string subject,
             string campaign,
@@ -840,7 +829,7 @@ namespace SalesManago
                 campaign,
                 html,
             };
-            var result = await this.SendSalesManagoRequest<SendEmailResponse>(
+            var result = await this.SendSalesManagoRequest<ConversationIdResponse>(
                 "api/email/sendWithAttachment", content, cancellationToken, "multipart/form-data");
             return result;
         }
@@ -911,7 +900,7 @@ namespace SalesManago
             return result;
         }
 
-        public async Task<EmailIdResponse> EmailAddTemplateAsync(
+        public async Task<TemplateIdResponse> EmailAddTemplateAsync(
             string emailContent,
             string urlTemplate,
             bool shared,
@@ -942,8 +931,757 @@ namespace SalesManago
                 urlTemplate,
                 customFields
             };
-            var result = await this.SendSalesManagoRequest<EmailIdResponse>(
+            var result = await this.SendSalesManagoRequest<TemplateIdResponse>(
                 "api/email/addTemplate", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<TemplateIdResponse> EmailUpsertTemplateAsync(
+            string emailContent,
+            string urlTemplate,
+            bool shared,
+            bool dynamic,
+            bool parametrized,
+            bool fromUrl,
+            bool titleUrl,
+            string customFields,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                date = sm.requestTime,
+                emailContent,
+                parametrized,
+                shared,
+                dynamic,
+                fromUrl,
+                titleUrl,
+                urlTemplate,
+                customFields
+            };
+            var result = await this.SendSalesManagoRequest<TemplateIdResponse>(
+                "api/email/upsertTemplate", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<GetMessagesResponse> DownloadEmailMessagesAsync(CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner
+            };
+            var result = await this.SendSalesManagoRequest<GetMessagesResponse>(
+                "api/email/messages", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ConversationListResponse> DownloadMassConversationAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<ConversationListResponse>(
+                "api/email/massConversationList", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ConversationListResponse> DownloadMassConversationDirectEmailsAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<ConversationListResponse>(
+                "api/email/massDirectConversationList", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ConversationListResponse> DownloadConversationStatisticsAsync(
+            Guid conversationId,
+            string user,
+            CancellationToken cancellationToken
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                conversationId,
+                user
+            };
+            var result = await this.SendSalesManagoRequest<ConversationListResponse>(
+                "api/email/massDirectConversationList", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<FileUrlResponse> JobStatusAsync(
+            int requestId,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                requestId
+            };
+
+            var result = await this.SendSalesManagoRequest<FileUrlResponse>(
+                "api/email/massDirectConversationList", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<RequestIdResponse> DownloadMessageStatisticsAsync(
+            Guid conversationId,
+            string user,
+            CancellationToken cancellationToken
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                conversationId,
+                user
+            };
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
+                "api/email/messageStatistics", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<RequestIdResponse> SendSubscriptionConfirmationAsync(
+            Guid conversationId,
+            string email,
+            string apiDoubleOptInEmailTemplateId,
+            string apiDoubleOptInEmailAccountId,
+            string apiDoubleOptInEmailSubject,
+            string? tag = null,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                conversationId,
+                email,
+                apiDoubleOptInEmailTemplateId,
+                apiDoubleOptInEmailAccountId,
+                apiDoubleOptInEmailSubject,
+                tag
+            };
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
+                "api/email/sendConfirmation", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<RequestIdResponse> SendSubscriptionConfirmationAsync(
+            Guid conversationId,
+            string email,
+            string lang,
+            string? tag = null,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                conversationId,
+                email,
+                lang,
+                tag
+            };
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
+                "api/email/sendConfirmation", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<BaseResponse> SendSmsAsync(
+            string user,
+            string text,
+            Recipient[] contacts,
+            string? gateway = null,
+            string? name = null,
+            long? date = null,
+            string? tag = null,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                user,
+                date,
+                text,
+                tag,
+                gateway,
+                name,
+                contacts
+            };
+            var result = await this.SendSalesManagoRequest<BaseResponse>(
+                "api/sms/send", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<SmsConversationStatisticsResponse> StatisticsOfSmsCampaignsByConversationIdAsync(
+            Guid conversationId,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                conversationId
+            };
+            var result = await this.SendSalesManagoRequest<SmsConversationStatisticsResponse>(
+                "api/sms/conversationStatistics", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<SmsConversationStatisticsResponse> StatisticsOfSmsCampaignsByNameAsync(
+            string name,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                name
+            };
+            var result = await this.SendSalesManagoRequest<SmsConversationStatisticsResponse>(
+                "api/sms/conversationStatisticsByName", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<SmsConversationStatisticsResponse> DownloadSmsConversationStatisticsAsync(
+            Guid conversationId,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                conversationId
+            };
+            var result = await this.SendSalesManagoRequest<SmsConversationStatisticsResponse>(
+                "api/sms/smsConversationStatistics", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ConversationListResponse> SmsDownloadMassConversationListAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<ConversationListResponse>(
+                "api/sms/massConversationList", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<TaskIdResponse> ContactUpdateTaskAsync(
+            SmsContactTask smContactTaskReq,
+            bool? finished = null,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                smContactTaskReq,
+                finished
+            };
+            var result = await this.SendSalesManagoRequest<TaskIdResponse>(
+                "api/contact/updateTask", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<BaseResponse> AddNoteAsync(
+            string contactId,
+            string email,
+            string note,
+            bool priv = false,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                contactId,
+                email,
+                note,
+                priv
+            };
+            var result = await this.SendSalesManagoRequest<BaseResponse>(
+                "api/contact/addNote", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<UsersResponse> ListUserAccountsByClientAsync(
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+            };
+            var result = await this.SendSalesManagoRequest<UsersResponse>(
+                "api/user/listByClient", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<AuthoriseResponse> AuthoriseAsync(
+            string userName,
+            string password,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                userName,
+                password
+            };
+            var result = await this.SendSalesManagoRequest<AuthoriseResponse>(
+                "api/system/authorise", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<WorkflowListResponse> DownloadWorkflowListAsync(
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+            };
+            var result = await this.SendSalesManagoRequest<WorkflowListResponse>(
+                "api/workflow/list", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<WebPushStatsResponse> WebPushStatsAsync(
+            long wizardId,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                wizardId
+            };
+            var result = await this.SendSalesManagoRequest<WebPushStatsResponse>(
+                "api/web/push/stats", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<WebPushIdsResponse> WebPushIdsAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<WebPushIdsResponse>(
+                "api/web/push/ids", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<PushConversationIdsResponse> WebPushNotificationIdListAsync(
+            long from,
+            long to,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                from,
+                to
+            };
+            var result = await this.SendSalesManagoRequest<PushConversationIdsResponse>(
+                "api/notification/conversation/ids", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<RequestIdResponse> ExportConsentFormsStatisticsAsync(
+            int inId,
+            string user,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                inId,
+                user
+            };
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
+                "api/notification/consent/form/stats", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<RequestIdResponse> ExportWebPushNotificationsAsync(
+            int inId,
+            string user,
+            string webPushSourceType,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                inId,
+                user,
+                webPushSourceType
+            };
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
+                "api/notification/push/stats", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ConsentFormListResponse> ConsentFormDataAsync(
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+            };
+            var result = await this.SendSalesManagoRequest<ConsentFormListResponse>(
+                "api/consent/form/data", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<PointsResponse> AddContactToLoyaltyProgramAsync(
+            AddresseeBase[] contacts,
+            string loyaltyProgram,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                contacts,
+                loyaltyProgram
+            };
+            var result = await this.SendSalesManagoRequest<PointsResponse>(
+                "api/loyalty/program/v1/addContact", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<BaseResponse> ModifyPointsInLoyaltyProgramAsync(
+            AddresseeBase[] contacts,
+            string loyaltyProgram,
+            int points,
+            ModificationType modificationType,
+            string? comment = null,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                contacts,
+                loyaltyProgram
+            };
+            var result = await this.SendSalesManagoRequest<BaseResponse>(
+                "api/loyalty/program/v1/modifyPoints", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ProductIdsResponse> LastViewedProducstsAsync(
+            string shopName,
+            Guid contactUuid,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                shopName,
+                contactUuid
+            };
+            var result = await this.SendSalesManagoRequest<ProductIdsResponse>(
+                "api/recommendation/lastViewed", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ProductIdsResponse> MostPurchasedProducstsAsync(
+            string shopName,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                shopName,
+            };
+            var result = await this.SendSalesManagoRequest<ProductIdsResponse>(
+                "api/recommendation/mostPurchased", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ProductIdsResponse> ProductsPurchasedByContactAsync(
+            string shopName,
+            Guid smClient,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                shopName,
+                smClient
+            };
+            var result = await this.SendSalesManagoRequest<ProductIdsResponse>(
+                "api/recommendation/purchasedByContact", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ProductIdsResponse> PurchasedTogetherAsync(
+            string shopName,
+            int productId,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                shopName,
+                productId
+            };
+            var result = await this.SendSalesManagoRequest<ProductIdsResponse>(
+                "api/recommendation/purchasedTogether", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<VisionResponse> VisionAsync(
+            string urlImg,
+            int vendorDataSourceIntId,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var sm = GetSalesManagoBase();
+
+            var content = new
+            {
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                owner = _settings.Owner,
+                urlImg,
+                vendorDataSourceIntId
+            };
+            var result = await this.SendSalesManagoRequest<VisionResponse>(
+                "api/vision", content, cancellationToken);
             return result;
         }
     }

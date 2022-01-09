@@ -9,13 +9,29 @@ namespace SalesManago
     public interface ISalesManagoService
     {
         /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T">Type of response that gets returned </typeparam>
+        /// <param name="url">url to the endpoint</param>
+        /// <param name="content">object to be serialized into request body</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <param name="contentType">contentType of request,
+        /// application/json is default used for most of them</param>
+        /// <returns></returns>
+        Task<T> SendSalesManagoRequest<T>(
+            string url,
+            object? content,
+            CancellationToken cancellationToken = default,
+            string contentType = "application/json");
+
+        /// <summary>
         /// <see href="https://docs.salesmanago.com/#downloading-email-messages">docs</see>
         /// </summary>
         /// <summary xml:lang="pl">
         /// <see href="https://docs.salesmanago.pl/#pobieranie-stworzonych-wiadomo-ci">docs</see>
         /// </summary>
         /// <returns></returns>
-        Task<GetMessagesResponse> GetEmailMessagesAsync(CancellationToken cancellationToken);
+        Task<GetMessagesResponse> DownloadEmailMessagesAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// <see href="https://docs.salesmanago.pl/#wysy-anie-wiadomo-ci-email-zalecana">docs</see>
@@ -28,7 +44,7 @@ namespace SalesManago
         /// <param name="excludeContacts"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<SendEmailResponse> SendEmailAsync(
+        Task<ConversationIdResponse> SendEmailAsync(
             Guid emailId,
             string subject,
             string campaign,
@@ -170,7 +186,7 @@ namespace SalesManago
         /// <param name="size">the number of returned lines (up to 1000)</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<PaginatedContactsListExportResponse> PaginatedContactListExportAsync(
+        Task<RequestIdResponse> PaginatedContactListExportAsync(
             int page,
             int size,
             CancellationToken cancellationToken);

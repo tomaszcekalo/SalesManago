@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SalesManago
+namespace SalesManago.Responses
 {
-    public class RequestIdResponse : BaseResponse
+    public class TaskIdResponse : BaseResponse
     {
-        public int RequestId { get; set; }
+        public string TaskId { get; set; }
     }
 }

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SalesManago
+namespace SalesManago.Common
 {
-    public class RequestIdResponse : BaseResponse
+    public class SmsConversationStatisticsResponse : ConversationIdResponse
     {
-        public int RequestId { get; set; }
     }
 }
