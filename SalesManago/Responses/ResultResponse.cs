@@ -10,6 +10,7 @@ namespace SalesManago.Responses
     {
         /// <summary>
         /// result of request
+        /// additional information enabling error identification
         /// </summary>
         public string Result { get; set; }
     }

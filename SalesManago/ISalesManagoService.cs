@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SalesManago.Common;
+using SalesManago.Responses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,20 +48,180 @@ namespace SalesManago
         /// <returns></returns>
         Task<ConversationIdResponse> SendEmailAsync(
             Guid emailId,
-            string subject,
-            string campaign,
-            string html,
             Addressee[] contacts,
-            Addressee[] excludeContacts,
+            Addressee[] excludeContacts = null,
+            string? html = null,
+            string? subject = null,
+            string? campaign = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// <see href="https://docs.salesmanago.com/#adding-a-new-contact-or-modifying-the-existing-contact"/>
+        /// </summary>
+        /// <param name="email">contact email</param>
+        /// <param name="contactId"></param>
+        /// <param name="contact"></param>
+        /// <param name="forceOptIn">forcing opt-in after adding/modification (if the previous option has not been chosen)</param>
+        /// <param name="forceOptOut">forcing opt-out after adding/modification</param>
+        /// <param name="forcePhoneOptIn">forcing opt-in to a phone after adding/modification (if the previous option has not been chosen)</param>
+        /// <param name="forcePhoneOptOut">forcing opt-out from a phone after adding/modification</param>
+        /// <param name="tags">array of contact’s tags</param>
+        /// <param name="removeTags">array of tags to be removed</param>
+        /// <param name="properties">contact attributes defined by the user. It is advised not to use special characters and spaces in the name, but it is allowed</param>
+        /// <param name="dictionaryProperties">user-defined attributes of the dictionary, the first to add a particular attribute can be used for the remaining contacts through re-enter the same name and type of the assigned another value.</param>
+        /// <param name="birthday"></param>
+        /// <param name="province"></param>
+        /// <param name="consentDetails"></param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        Task<ContactIdsResponse> ContactUpsertAsync(
+            string email,
+            string contactId,
+            ContactBase contact,
+            bool forceOptIn,
+            bool forceOptOut,
+            bool forcePhoneOptIn,
+            bool forcePhoneOptOut,
+            string[] tags,
+            string removeTags,
+            Dictionary<string, string> properties,
+            DictionaryProperty[] dictionaryProperties,
+            string birthday,
+            string province,
+            ConsentDetail[] consentDetails,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// <see href="https://docs.salesmanago.com/#adding-a-new-contact"/>
+        /// </summary>
+        /// <param name="email">contact email</param>
+        /// <param name="contactId"></param>
+        /// <param name="contact"></param>
+        /// <param name="forceOptIn">forcing opt-in after adding/modification (if the previous option has not been chosen)</param>
+        /// <param name="forceOptOut">forcing opt-out after adding/modification</param>
+        /// <param name="forcePhoneOptIn">forcing opt-in to a phone after adding/modification (if the previous option has not been chosen)</param>
+        /// <param name="forcePhoneOptOut">forcing opt-out from a phone after adding/modification</param>
+        /// <param name="tags">array of contact’s tags</param>
+        /// <param name="removeTags">array of tags to be removed</param>
+        /// <param name="properties">contact attributes defined by the user. It is advised not to use special characters and spaces in the name, but it is allowed</param>
+        /// <param name="dictionaryProperties">user-defined attributes of the dictionary, the first to add a particular attribute can be used for the remaining contacts through re-enter the same name and type of the assigned another value.</param>
+        /// <param name="birthday"></param>
+        /// <param name="province"></param>
+        /// <param name="consentDetails"></param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        Task<ContactIdsResponse> ContactInsertAsync(
+            string email,
+            string contactId,
+            ContactBase contact,
+            bool forceOptIn,
+            bool forceOptOut,
+            bool forcePhoneOptIn,
+            bool forcePhoneOptOut,
+            string[] tags,
+            string removeTags,
+            Dictionary<string, string> properties,
+            DictionaryProperty[] dictionaryProperties,
+            string birthday,
+            string province,
+            ConsentDetail[] consentDetails,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// <see href="https://docs.salesmanago.com/#modifying-an-existing-contact"/>
+        /// </summary>
+        /// <param name="email">contact email</param>
+        /// <param name="contactId"></param>
+        /// <param name="contact"></param>
+        /// <param name="forceOptIn">forcing opt-in after adding/modification (if the previous option has not been chosen)</param>
+        /// <param name="forceOptOut">forcing opt-out after adding/modification</param>
+        /// <param name="forcePhoneOptIn">forcing opt-in to a phone after adding/modification (if the previous option has not been chosen)</param>
+        /// <param name="forcePhoneOptOut">forcing opt-out from a phone after adding/modification</param>
+        /// <param name="tags">array of contact’s tags</param>
+        /// <param name="removeTags">array of tags to be removed</param>
+        /// <param name="properties">contact attributes defined by the user. It is advised not to use special characters and spaces in the name, but it is allowed</param>
+        /// <param name="dictionaryProperties">user-defined attributes of the dictionary, the first to add a particular attribute can be used for the remaining contacts through re-enter the same name and type of the assigned another value.</param>
+        /// <param name="birthday"></param>
+        /// <param name="province"></param>
+        /// <param name="consentDetails"></param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        Task<ContactIdsResponse> ContactUpdateAsync(
+            string email,
+            string contactId,
+            ContactBase contact,
+            bool forceOptIn,
+            bool forceOptOut,
+            bool forcePhoneOptIn,
+            bool forcePhoneOptOut,
+            string[] tags,
+            string removeTags,
+            Dictionary<string, string> properties,
+            DictionaryProperty[] dictionaryProperties,
+            string birthday,
+            string province,
+            ConsentDetail[] consentDetails,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// https://docs.salesmanago.com/#adding-or-modifying-many-contacts-simultaneously
+        /// </summary>
+        /// <param name="upsertDetails"></param>
+        /// <param name="useApiDoubleOptIn"></param>
+        /// <param name="lang"></param>
+        /// <param name="fireEvents"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<ContactIdsResponse> ContactBatchUpsertAsync(
+            UpsertDetail[] upsertDetails,
+            bool useApiDoubleOptIn,
+            string lang,
+            bool fireEvents,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="upsertDetails"></param>
+        /// <param name="useApiDoubleOptIn">use double opt-in option, default true</param>
+        /// <param name="lang">contact language</param>
+        /// <param name="fireEvents">If the method is set to “false” it prevents the rules and Workflows triggered by events created during the contact upsert (import with overwriting and modification of existing contacts) from launching</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        Task<RequestIdResponse> ContactBatchUpsertV2Async(
+            UpsertDetail[] upsertDetails,
+            bool useApiDoubleOptIn,
+            string lang,
+            bool fireEvents,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// https://docs.salesmanago.com/#deleting-many-contacts-simultaneously
+        /// </summary>
+        /// <param name="contacts">array of contacts to delete</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        Task<ResultResponse> ContactBatchDeleteAsync(
+            Addressee[] contacts,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// <see href="https://docs.salesmanago.com/#deleting-a-contact"/>
+        /// </summary>
+        /// <param name="email">contact email</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        Task<ResultResponse> DeleteContactAsync(
+            string email,
             CancellationToken cancellationToken);
 
         /// <summary>
         /// <see href="https://docs.salesmanago.com/#checking-if-a-contact-is-already-recorded">docs</see>
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="email">contact’s email</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns></returns>
-        Task<HasContactResponse> HasContactAsync(
+        Task<ContactIdResponse> HasContactAsync(
             string email,
             CancellationToken cancellationToken);
 

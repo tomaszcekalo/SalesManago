@@ -63,7 +63,22 @@ namespace SalesManago
             }
         }
 
-        public async Task<HasContactResponse> HasContactAsync(string email, CancellationToken cancellationToken)
+        public async Task<ContactIdsResponse> ContactUpsertAsync(
+            string email,
+            string contactId,
+            ContactBase contact,
+            bool forceOptIn,
+            bool forceOptOut,
+            bool forcePhoneOptIn,
+            bool forcePhoneOptOut,
+            string[] tags,
+            string removeTags,
+            Dictionary<string, string> properties,
+            DictionaryProperty[] dictionaryProperties,
+            string birthday,
+            string province,
+            ConsentDetail[] consentDetails,
+            CancellationToken cancellationToken = default)
         {
             var sm = GetSalesManagoBase();
             var content = new
@@ -73,10 +88,213 @@ namespace SalesManago
                 sm.apiKey,
                 sm.requestTime,
                 sm.sha,
-                user = _settings.Owner,
+                email,
+                contactId,
+                contact,
+                forceOptIn,
+                forceOptOut,
+                forcePhoneOptIn,
+                forcePhoneOptOut,
+                tags,
+                removeTags,
+                properties,
+                dictionaryProperties,
+                birthday,
+                province,
+                consentDetails
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdsResponse>(
+                "api/contact/upsert", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactIdsResponse> ContactInsertAsync(
+            string email,
+            string contactId,
+            ContactBase contact,
+            bool forceOptIn,
+            bool forceOptOut,
+            bool forcePhoneOptIn,
+            bool forcePhoneOptOut,
+            string[] tags,
+            string removeTags,
+            Dictionary<string, string> properties,
+            DictionaryProperty[] dictionaryProperties,
+            string birthday,
+            string province,
+            ConsentDetail[] consentDetails,
+            CancellationToken cancellationToken = default)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                email,
+                contactId,
+                contact,
+                forceOptIn,
+                forceOptOut,
+                forcePhoneOptIn,
+                forcePhoneOptOut,
+                tags,
+                removeTags,
+                properties,
+                dictionaryProperties,
+                birthday,
+                province,
+                consentDetails
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdsResponse>(
+                "api/contact/insert", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactIdsResponse> ContactUpdateAsync(
+            string email,
+            string contactId,
+            ContactBase contact,
+            bool forceOptIn,
+            bool forceOptOut,
+            bool forcePhoneOptIn,
+            bool forcePhoneOptOut,
+            string[] tags,
+            string removeTags,
+            Dictionary<string, string> properties,
+            DictionaryProperty[] dictionaryProperties,
+            string birthday,
+            string province,
+            ConsentDetail[] consentDetails,
+            CancellationToken cancellationToken = default)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                email,
+                contactId,
+                contact,
+                forceOptIn,
+                forceOptOut,
+                forcePhoneOptIn,
+                forcePhoneOptOut,
+                tags,
+                removeTags,
+                properties,
+                dictionaryProperties,
+                birthday,
+                province,
+                consentDetails
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdsResponse>(
+                "api/contact/update", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactIdsResponse> ContactBatchUpsertAsync(
+            UpsertDetail[] upsertDetails,
+            bool useApiDoubleOptIn,
+            string lang,
+            bool fireEvents,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                upsertDetails,
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdsResponse>(
+                "api/contact/batchupsert", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<RequestIdResponse> ContactBatchUpsertV2Async(
+            UpsertDetail[] upsertDetails,
+            bool useApiDoubleOptIn,
+            string lang,
+            bool fireEvents,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                upsertDetails,
+            };
+            var result = await this.SendSalesManagoRequest<RequestIdResponse>(
+                "api/contact/batchupsertv2", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ResultResponse> ContactBatchDeleteAsync(
+            Addressee[] contacts,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                contacts,
+            };
+            var result = await this.SendSalesManagoRequest<ResultResponse>(
+                "api/contact/batchDelete", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ResultResponse> DeleteContactAsync(
+            string email,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
                 email
             };
-            var result = await this.SendSalesManagoRequest<HasContactResponse>(
+            var result = await this.SendSalesManagoRequest<ResultResponse>(
+                "api/contact/delete", content, cancellationToken);
+            return result;
+        }
+
+        public async Task<ContactIdResponse> HasContactAsync(
+            string email,
+            CancellationToken cancellationToken)
+        {
+            var sm = GetSalesManagoBase();
+            var content = new
+            {
+                owner = _settings.Owner,
+                clientId = _settings.ClientId,
+                sm.apiKey,
+                sm.requestTime,
+                sm.sha,
+                email
+            };
+            var result = await this.SendSalesManagoRequest<ContactIdResponse>(
                 "api/contact/hasContact", content, cancellationToken);
             return result;
         }
@@ -769,12 +987,12 @@ namespace SalesManago
 
         public async Task<ConversationIdResponse> SendEmailAsync(
             Guid emailId,
-            string subject,
-            string campaign,
-            string html,
             Addressee[] contacts,
-            Addressee[] excludeContacts,
-            CancellationToken cancellationToken)
+            Addressee[]? excludeContacts = null,
+            string? html = null,
+            string? subject = null,
+            string? campaign = null,
+            CancellationToken cancellationToken = default)
         {
             var sm = GetSalesManagoBase();
 
