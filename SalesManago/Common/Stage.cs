@@ -9,7 +9,7 @@ namespace SalesManago
     public class Stage
     {
         /// <summary>
-        /// funnel stage name (min. 3 characters)
+        /// funnel stage name (min. 3 characters, max 255 characters)
         /// </summary>
         public string Name { get; set; }
 

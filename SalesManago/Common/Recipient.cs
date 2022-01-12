@@ -11,7 +11,7 @@ namespace SalesManago.Common
         /// <summary>
         /// contact email
         /// </summary>
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         /// <summary>
         /// contact id
@@ -21,6 +21,6 @@ namespace SalesManago.Common
         /// <summary>
         /// tag assigned to the SALESmanago contact group (in the “contacts” field you can use up to 10 “tag” objects)
         /// </summary>
-        public string Tag { get; set; }
+        public string? Tag { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace SalesManago
         /// <summary>
         /// contact’s email for which the event is added
         /// </summary>
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         /// <summary>
         /// external event object ( read more - Adding Event at https://docs.salesmanago.com/#addingEvent)
