@@ -15,7 +15,7 @@
     <Copyright>Copyright © 2022 Tomasz Cekało</Copyright>
     <PackageTags>salesmanago, marketing, automation, segmentation, </PackageTags>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT-advertising</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
