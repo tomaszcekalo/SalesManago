@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using SalesManago.Responses;
 using System.Collections.Specialized;
 using SalesManago.Common;
+using System.Net.Http;
+using System.Threading;
 
 namespace SalesManago
 {
@@ -16,7 +18,7 @@ namespace SalesManago
     {
         private SalesManagoSettings _settings;
         private HttpClient _client;
-        public JsonSerializerSettings Settings { get; init; }
+        public JsonSerializerSettings Settings { get; }
 
         public SalesManagoService(SalesManagoSettings settings, HttpClient httpClient)
         {
@@ -76,7 +78,7 @@ namespace SalesManago
             var response = await _client.SendAsync(request, cancellationToken);
             using (HttpContent responseContent = response.Content)
             {
-                var json = await responseContent.ReadAsStringAsync(cancellationToken);
+                var json = await responseContent.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<T>(json);
                 return result;
             }

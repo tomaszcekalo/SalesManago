@@ -1,4 +1,7 @@
-﻿namespace SalesManago
+﻿using System;
+using System.Collections.Generic;
+
+namespace SalesManago
 {
     public class ContactIdsResponse : BaseResponse
     {

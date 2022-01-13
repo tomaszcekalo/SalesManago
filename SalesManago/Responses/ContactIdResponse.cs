@@ -1,4 +1,6 @@
-﻿namespace SalesManago
+﻿using System;
+
+namespace SalesManago
 {
     public class ContactIdResponse : BaseResponse
     {
