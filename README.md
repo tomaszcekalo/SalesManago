@@ -5,3 +5,4 @@
 
 # SalesManago
 .NET library to integrate with SalesManago.pl Customer Data Platform
+[![CodeFactor](https://www.codefactor.io/repository/github/tomaszcekalo/SalesManago/badge)](https://www.codefactor.io/repository/github/tomaszcekalo/SalesManago)
